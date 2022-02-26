@@ -16,42 +16,32 @@ class GalleryView extends StatelessWidget {
         _galleryViewModel.getAlbums();
       },
       onPageBuilder: (context, value) => Scaffold(
-        body: Column(
-          children: [
-            Observer(builder: (_) {
-              return Text(value.num.toString());
-            }),
-            value.albums.isEmpty ? _buildLoading() : _buildLoaded(value),
-          ],
+        body: Observer(
+          builder: (_) {
+            return value.isLoading ? _buildLoading() : _buildLoaded(value);
+          },
         ),
-        floatingActionButton: FloatingActionButton(onPressed: () {
-          value.increase();
-        }),
       ),
     );
   }
 
-  Observer _buildLoaded(GalleryViewModel value) {
-    return Observer(
-      builder: (_) {
-        return ListView.builder(
-          itemCount: value.albums.length,
-          itemBuilder: (BuildContext context, int index) {
-            AlbumModel albumModel = value.albums[index];
-            return Column(
-              children: [
-                SizedBox(
-                  width: 400,
-                  height: 200,
-                  child: Image.network(
-                    albumModel.url!,
-                    fit: BoxFit.fitWidth,
-                  ),
-                ),
-                Text(albumModel.title!)
-              ],
-            );
-          },
+  Widget _buildLoaded(GalleryViewModel value) {
+    return ListView.builder(
+      itemCount: value.albums.length,
+      itemBuilder: (BuildContext context, int index) {
+        AlbumModel albumModel = value.albums[index];
+        return Column(
+          children: [
+            SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                albumModel.url!,
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+            Text(albumModel.title!)
+          ],
         );
       },
     );
