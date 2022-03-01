@@ -1,4 +1,5 @@
 import 'package:mobx/mobx.dart';
+import 'package:mobx_usage/view/gallery/service/gallery_service.dart';
 import 'package:vexana/vexana.dart';
 
 import '../../core/model/album_model.dart';
@@ -7,8 +8,8 @@ part 'gallery_view_model.g.dart';
 class GalleryViewModel = GalleryViewModelBase with _$GalleryViewModel;
 
 abstract class GalleryViewModelBase with Store {
-  INetworkManager networkManager = NetworkManager(isEnableLogger: true, options: BaseOptions(baseUrl: "https://jsonplaceholder.typicode.com/"));
-  // final INetworkManager _networkManager = NetworkManager(options: BaseOptions(baseUrl: "https://jsonplaceholder.typicode.com/"));
+  final IGalleryService _galleryService =
+      GalleryService(NetworkManager(isEnableLogger: true, options: BaseOptions(baseUrl: "https://jsonplaceholder.typicode.com/")));
   @observable
   late List<AlbumModel> albums = [];
   @observable
@@ -18,12 +19,11 @@ abstract class GalleryViewModelBase with Store {
   getAlbums() async {
     try {
       isLoading = true;
-      final response =
-          await ObservableFuture(networkManager.send<AlbumModel, List<AlbumModel>>("/photos", parseModel: AlbumModel(), method: RequestType.GET));
-      if (response.data!.isNotEmpty) {
+      final response = await _galleryService.getAllAlbums();
+      if (response!.isNotEmpty) {
         isLoading = false;
       }
-      albums = response.data!;
+      albums = response;
     } catch (e) {
       isLoading = false;
     }
